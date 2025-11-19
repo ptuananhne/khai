@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi Chồng Yêu 19-11</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CẤU HÌNH CƠ BẢN --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #ffe6e6;
+            font-family: 'Quicksand', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Ẩn thanh cuộn */
+            position: relative;
+        }
+
+        /* --- MÀN HÌNH LÁ THƯ (Ban đầu) --- */
+        #envelope-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffe6e6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            cursor: pointer;
+            transition: opacity 1s ease;
+        }
+
+        .envelope-icon {
+            font-size: 100px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .click-hint {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #d63031;
+            font-weight: bold;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        /* --- MÀN HÌNH CHÍNH (Sau khi mở) --- */
+        #main-content {
+            display: none; /* Ẩn đi ban đầu */
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            padding-top: 20px;
+            opacity: 0;
+            transition: opacity 2s ease-in;
+        }
+
+        .header-badge {
+            background-color: #8e44ad;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        /* Cây trái tim */
+        .tree-container {
+            width: 300px;
+            height: 300px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/3062/3062634.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            animation: heartbeat 1.5s infinite alternate;
+        }
+
+        /* Khung lời chúc */
+        .message-box {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.4rem;
+            color: #d63031;
+            min-height: 150px; /* Giữ khung cố định để chữ chạy không bị giật */
+            position: relative;
+        }
+        
+        /* Con trỏ nhấp nháy ở cuối chữ */
+        #typing-text::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+
+        .timer-box {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .count {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3436;
+        }
+        .count span { color: #e17055; font-size: 1.4rem;}
+
+        /* --- ANIMATIONS --- */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes heartbeat {
+            from { transform: scale(1); }
+            to { transform: scale(1.03); }
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div id="envelope-screen" onclick="openLetter()">
+        <div class="envelope-icon">💌</div>
+        <div class="click-hint">Có thư nè, em bé bấm vào đi!</div>
+    </div>
+
+    <div id="main-content">
+        <div class="header-badge">
+            1 chiếc web nhỏ tặng em bé iu 20-11 💕
+        </div>
+
+        <div class="tree-container"></div>
+
+        <div class="message-box">
+            <p id="typing-text"></p> 
+        </div>
+
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="thangdien.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+
+        const startDate = new Date(2018, 9, 20, 12, 0, 0); // Tháng 10 điền số 9
+
+        const fullMessage = 
+`
+Hello!
+🌼 Chúc cô giáo nhỏ của anh ngày 20/11 thật tươi vui và hạnh phúc! 💛
+
+✨ Hy vọng hôm nay em cười nhiều, được các học sinh nhỏ thương 🧒❤️, được đồng nghiệp yêu quý 👩‍🏫🤝, và nhận đúng những điều dễ thương mà em xứng đáng.
+
+🌟 Mong em sẽ thành công trong sự nghiệp và sớm về bên tui nha.
+
+💕 Chúc em bé một ngày thật tốt đẹp, nhận được nhiều niềm vui và nụ cười nhaaa 😊🌷
+ `
+
+
+        function openLetter() {
+            // 1. Ẩn thư
+            const envelope = document.getElementById('envelope-screen');
+            const mainContent = document.getElementById('main-content');
+            const audio = document.getElementById('bgMusic');
+
+            envelope.style.opacity = '0';
+            
+            // 2. Đợi thư mờ dần rồi hiện nội dung chính
+            setTimeout(() => {
+                envelope.style.display = 'none';
+                mainContent.style.display = 'flex';
+                
+                // Hiệu ứng fade-in cho nội dung
+                setTimeout(() => {
+                    mainContent.style.opacity = '1';
+                }, 100);
+
+                // 3. Bật nhạc (Trình duyệt cho phép phát khi có tương tác click)
+                audio.play().catch(e => console.log("Chưa bật được nhạc: " + e));
+                
+                // 4. Bắt đầu chạy chữ
+                typeWriter();
+
+            }, 1000);
+        }
+
+        // Hiệu ứng gõ chữ (Typewriter)
+        let i = 0;
+        const speed = 50; // Tốc độ gõ (ms), càng nhỏ càng nhanh
+        const textElement = document.getElementById("typing-text");
+
+        function typeWriter() {
+            if (i < fullMessage.length) {
+                // Xử lý xuống dòng
+                if (fullMessage.charAt(i) === '\n') {
+                    textElement.innerHTML += '<br>';
+                } else {
+                    textElement.innerHTML += fullMessage.charAt(i);
+                }
+                i++;
+                setTimeout(typeWriter, speed);
+            }
+        }
+
+        // Bộ đếm thời gian
+        function updateTimer() {
+            const now = new Date();
+            const diff = now - startDate;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+            
+            document.getElementById('timer').innerHTML = 
+                `<span>${days}</span> Ngày <span>${hours}</span> : <span>${minutes}</span> : <span>${seconds}</span>`;
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+    </script>
+</body>
+</html>

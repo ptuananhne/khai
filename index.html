@@ -5,129 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gửi Chồng Yêu 19-11</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* --- CẤU HÌNH CƠ BẢN --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #ffe6e6;
-            font-family: 'Quicksand', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; /* Ẩn thanh cuộn */
-            position: relative;
-        }
+   <style>
+    /* --- CẤU HÌNH CƠ BẢN --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+        background-color: #ffe6e6;
+        font-family: 'Quicksand', sans-serif;
+        min-height: 100vh; /* Chiều cao tối thiểu bằng màn hình */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* Bỏ hidden để cho phép cuộn */
+        overflow-y: auto; 
+        position: relative;
+    }
 
-        /* --- MÀN HÌNH LÁ THƯ (Ban đầu) --- */
-        #envelope-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffe6e6;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            cursor: pointer;
-            transition: opacity 1s ease;
-        }
+    /* --- MÀN HÌNH LÁ THƯ (Ban đầu) --- */
+    #envelope-screen {
+        position: fixed; /* Giữ cố định lá thư dù trang có cuộn */
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: #ffe6e6;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        cursor: pointer;
+        transition: opacity 1s ease;
+    }
 
-        .envelope-icon {
-            font-size: 100px;
-            animation: pulse 1.5s infinite;
-        }
+    .envelope-icon {
+        font-size: 100px;
+        animation: pulse 1.5s infinite;
+    }
 
-        .click-hint {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            color: #d63031;
-            font-weight: bold;
-            animation: float 2s ease-in-out infinite;
-        }
+    .click-hint {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #d63031;
+        font-weight: bold;
+        animation: float 2s ease-in-out infinite;
+    }
 
-        /* --- MÀN HÌNH CHÍNH (Sau khi mở) --- */
-        #main-content {
-            display: none; /* Ẩn đi ban đầu */
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            height: 100vh;
-            padding-top: 20px;
-            opacity: 0;
-            transition: opacity 2s ease-in;
-        }
+    /* --- MÀN HÌNH CHÍNH (Sau khi mở) --- */
+    #main-content {
+        display: none; 
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start; /* Căn nội dung từ trên xuống */
+        width: 100%;
+        min-height: 100vh; /* Tự động giãn chiều cao */
+        padding-top: 20px;
+        padding-bottom: 50px; /* Để chừa khoảng trống ở đáy khi cuộn */
+        opacity: 0;
+        transition: opacity 2s ease-in;
+    }
 
-        .header-badge {
-            background-color: #8e44ad;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            margin-bottom: 10px;
-        }
+    .header-badge {
+        background-color: #8e44ad;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        margin-bottom: 20px;
+        text-align: center;
+        line-height: 1.4;
+    }
 
-        /* Cây trái tim */
-        .tree-container {
-            width: 300px;
-            height: 300px;
-            background-image: url('https://cdn-icons-png.flaticon.com/512/3062/3062634.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            animation: heartbeat 1.5s infinite alternate;
-        }
+    /* Cây trái tim */
+    .tree-container {
+        width: 300px;
+        height: 300px;
+        background-image: url('https://cdn-icons-png.flaticon.com/512/3062/3062634.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        animation: heartbeat 1.5s infinite alternate;
+        flex-shrink: 0; /* Không cho cây bị co lại */
+    }
 
-        /* Khung lời chúc */
-        .message-box {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            font-family: 'Dancing Script', cursive;
-            font-size: 1.4rem;
-            color: #d63031;
-            min-height: 150px; /* Giữ khung cố định để chữ chạy không bị giật */
-            position: relative;
-        }
-        
-        /* Con trỏ nhấp nháy ở cuối chữ */
-        #typing-text::after {
-            content: '|';
-            animation: blink 1s infinite;
-        }
+    /* Khung lời chúc */
+    .message-box {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px; /* Cho khung rộng hơn chút */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        font-family: 'Dancing Script', cursive;
+        font-size: 1.5rem; /* Chữ to hơn xíu cho dễ đọc */
+        color: #d63031;
+        position: relative;
+        margin-bottom: 20px;
+        word-wrap: break-word; /* Tự xuống dòng nếu chữ quá dài */
+    }
+    
+    /* Con trỏ nhấp nháy */
+    #typing-text::after {
+        content: '|';
+        animation: blink 1s infinite;
+    }
 
-        .timer-box {
-            margin-top: 15px;
-            text-align: center;
-        }
-        .count {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #2d3436;
-        }
-        .count span { color: #e17055; font-size: 1.4rem;}
+    .timer-box {
+        margin-top: 10px;
+        text-align: center;
+        padding-bottom: 30px;
+    }
+    .count {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #2d3436;
+    }
+    .count span { color: #e17055; font-size: 1.4rem;}
 
-        /* --- ANIMATIONS --- */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        @keyframes heartbeat {
-            from { transform: scale(1); }
-            to { transform: scale(1.03); }
-        }
-        @keyframes blink { 50% { opacity: 0; } }
-    </style>
+    /* --- ANIMATIONS --- */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    @keyframes heartbeat {
+        from { transform: scale(1); }
+        to { transform: scale(1.03); }
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+</style>
 </head>
 <body>
 
@@ -231,4 +240,5 @@ Hello!
         updateTimer();
     </script>
 </body>
+
 </html>
